@@ -660,8 +660,16 @@ class MWBot {
                     let operationJobs = jobs[operation];
                     if (Array.isArray(operationJobs)) {
                         if (operation === 'upload' || operation === 'uploadOverwrite') {
-                            for (let filePath of operationJobs) {
-                                jobQueue.push([operation, path.basename(filePath), filePath, summary, false, customRequestOptions]);
+                            for (let data of operationJobs) {
+                                let filePath, customParams = false;
+                                if ( data.constructor && data.constructor.name === 'String' ) {
+                                    filePath = data;
+                                } else {
+                                    customParams = MWBot.merge({}, data);
+                                    filePath = customParams.filePath;
+                                    delete customParams.filePath;
+                                }
+                                jobQueue.push([operation, false, filePath, summary, customParams, customRequestOptions]);
                             }
                         } else {
                             for (let pageName of operationJobs) {
